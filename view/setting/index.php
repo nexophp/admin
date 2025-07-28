@@ -60,12 +60,14 @@ global $homepages;
                     </div>
 
                     <div class="col-md-3">
-                        <label for="siteName" class="form-label"><?=lang('PC端首页')?></label>
-                        <el-select v-model="form.home_class" placeholder="请选择">
-                            <?php foreach($homepages as $v){?>
-                            <el-option label="<?=$v['title']?>" value="<?=$v['url']?>"></el-option>
-                            <?php }?> 
-                        </el-select>
+                        <label  class="form-label"><?=lang('PC端首页')?></label>
+                        <div>
+                             <el-select v-model="form.home_class" placeholder="请选择">
+                                <?php foreach($homepages as $v){?>
+                                <el-option label="<?=$v['title']?>" value="<?=$v['url']?>"></el-option>
+                                <?php }?> 
+                            </el-select>
+                        </div>
                     </div>
 
                     <div class="col-md-6">
