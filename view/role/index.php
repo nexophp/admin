@@ -6,6 +6,7 @@ $url = '/admin/role/list';
 
 // 初始化Vue数据
 $vue->data("height", "");
+$vue->data("pop_height", "");
 $vue->data("dialogVisible", false);
 $vue->data("form", [
     'id' => '',
@@ -22,6 +23,7 @@ $vue->created(["load()", "loadPermissions()"]);
 // 设置表格高度
 $vue->method("load()", "
 this.height = 'calc(100vh - ".get_config('admin_table_height')."px)';
+this.pop_height = 'calc(100vh - 260px - ".get_config('admin_table_height')."px)';
 ");
 
 // 加载权限列表
@@ -192,7 +194,7 @@ echo element("pager", [
             <el-input v-model="form.description" placeholder="<?=lang('请输入角色描述')?>" type="textarea" :rows="3"></el-input>
         </el-form-item>
         <el-form-item label="<?=lang('权限设置')?>">
-            <el-table
+            <el-table :height="pop_height"
                 :data="permissionList.reduce((acc, module) => acc.concat(module.children || []), [])"
                 style="width: 100%"
                 row-key="name"

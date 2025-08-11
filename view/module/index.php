@@ -55,27 +55,12 @@ echo element('table', [
         'tpl' => [
             ['name' => 'html', 'html' => '<div v-html="scope.row.depends"></div>'], 
         ] 
-    ],
-
-
-    ['name' => 'column', 'prop' => 'module_info.author', 'label' => lang('模块作者'), 'width' => '',
-        'tpl' => [
-            ['name' => 'html', 'html' => '
-                <div v-if="scope.row.module_info.url">
-                    <a :href="scope.row.module_info.url" class="link hand" target="_blank">{{scope.row.module_info.author}}</a>
-                </div>
-                <div v-else>
-                    {{scope.row.module_info.author}}
-                </div>
-            '], 
-        ]
-
-    ],
+    ], 
     [
         'name' => 'column',
         'prop' => 'count',
         'label' => lang('操作'),
-        'width' => '200',
+        'width' => '130',
         'tpl' => [
             ['name' => 'button', 'label' => lang('安装'), '@click' => 'install(scope.row.id)',"v-if"=>"scope.row.status!=1 && can_install"],
             ['name' => 'button', 'label' => lang('卸载'), '@click' => 'uninstall(scope.row.id)', "v-else-if"=>"scope.row.status==1 &&  can_uninstall",'style'=>'color:red;'],
