@@ -67,13 +67,24 @@
        
         <iframe src="/admin/user-bind" style="width:100%;height:100%;border:0"></iframe> 
         </el-drawer>
-    <!-- 顶部导航栏 -->
-    <nav class="navbar navbar-expand-lg navbar-light">
-        <div class="container-fluid">
-            <i class="bi bi-list toggle-sidebar-btn me-3" id="toggleSidebar"></i>
-            <a class="navbar-brand" href="#"></a>
-            <div class="ms-auto d-flex align-items-center"> 
-                <?php do_action('header_right')?>
+
+        <nav class="navbar navbar-expand-lg navbar-light">
+        <div class="container-fluid d-flex justify-content-between align-items-center">
+            <!-- 左侧部分 -->
+            <div class="d-flex align-items-center">
+                <i class="bi bi-list toggle-sidebar-btn me-3" id="toggleSidebar"></i>
+                <a class="navbar-brand" href="#"></a>
+                <?php do_action("header_left") ?>
+            </div>
+            
+            <!-- 中间部分 -->
+            <div class="mx-auto">
+                <?php do_action("header_center") ?>
+            </div>
+            
+            <!-- 右侧部分 -->
+            <div class="d-flex align-items-center">
+               <?php do_action('header_right')?>
                 <!-- 管理员头像下拉菜单 -->
                 <div class="dropdown">
                     <a class="nav-link dropdown-toggle" href="#" role="button" id="adminDropdown" data-bs-toggle="dropdown" aria-expanded="false">
@@ -88,7 +99,7 @@
                 </div>
             </div>
         </div>
-    </nav>
+    </nav> 
 
     <!-- 左侧菜单（展开式） -->
     <div class="sidebar">
