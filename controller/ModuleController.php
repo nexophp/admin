@@ -42,6 +42,21 @@ class ModuleController extends \core\AdminController
     {
         $id = $this->post_data['id'];
         $res = db_get_one('module', '*', ['id' => $id]);
+        $depends = $res['module_info']['depends'];
+        if($depends){
+            foreach($depends as $item){
+                 $new_res = db_get_one('module', '*', ['name' => $item]);
+                 if(!$new_res){
+                    json_error(['msg' => lang('模块不存在')]);
+                 }
+                 $this->doInstall($new_res);
+            }
+        } 
+        $this->doInstall($res);  
+        json_success(['msg' => lang('安装成功')]);
+    }
+
+    protected function doInstall($res){
         $module_info = $res['module_info'];
         $path = $res['path'];
         $version = $module_info['version'];
@@ -69,9 +84,8 @@ class ModuleController extends \core\AdminController
                 });
             }
         }
-        db_update('module', ['status' => 1, 'updated_at' => time()], ['id' => $id]);
+        db_update('module', ['status' => 1, 'updated_at' => time()], ['id' => $res['id']]);
 
-        json_success(['msg' => lang('安装成功')]);
     }
     /**
      * 卸载
@@ -131,6 +145,20 @@ class ModuleController extends \core\AdminController
             ];
         }
         $list = db_pager('module', '*', $where);
+        foreach ($list['data'] as $k => &$v) { 
+            $depends = $v['module_info']['depends']; 
+            $str = "";
+            if ($depends) {
+                 foreach($depends as $item){ 
+                    if(has_installed_module($item)){ 
+                        $str .= "<span class='el-tag el-tag--success mr-3' style='margin-right:10px'>$item</span>";
+                    }else{
+                        $str .= "<span title='".lang('模块未安装')."' class='el-tag el-tag--danger mr-3' style='margin-right:10px'>$item</span>";
+                    }
+                 }
+            }
+            $v['depends'] = $str; 
+        } 
         json($list);
     }
     /**
@@ -139,6 +167,7 @@ class ModuleController extends \core\AdminController
      */
     protected function loadFromVendor()
     {
+        global $modules; 
         $output = [];
         $list = get_all_modules();
         foreach ($list as $file) {
@@ -146,7 +175,7 @@ class ModuleController extends \core\AdminController
             if (!$name) {
                 continue;
             }
-            require $file;
+            $module_info = $modules[$name];
             $path = get_module_path($file);
             $output[$name] = [
                 'title' => $module_info['title'],

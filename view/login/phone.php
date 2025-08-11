@@ -1,5 +1,5 @@
 <?php 
-view_header(lang('手机验证码登录'));
+view_header(lang('手机验证码登录'));  
 ?>
 
 <div class="login-wrapper">
@@ -39,14 +39,14 @@ view_header(lang('手机验证码登录'));
                     <div class="d-flex">
                         <el-button 
                             type="primary" 
-                            @click="login"
+                            @click="login_click"
                             style="flex: 1;"
                             :loading="loading"
                         >
                            '.lang('登录').'</el-button>
                         <el-button 
                             type="default" 
-                            @click="sendCode"
+                            @click="code_click"
                             style="margin-left: 10px;"
                             :loading="sendingCode"
                             :disabled="countdown > 0"
@@ -77,7 +77,12 @@ $vue->data("form", [
     'phone' => '',
     'code' => ''
 ]);
-
+$vue->method("login_click()","
+    this.login();
+");
+$vue->method("code_click()","
+    this.sendCode();
+");
 $vue->method("login()", "
     if (!this.form.phone) {
         this.\$message.error('" . lang('请输入手机号') . "');
@@ -105,7 +110,8 @@ $vue->method("sendCode()", "
         return;
     }
     this.sendingCode = true;
-    ajax('/admin/login/send-phone-code', { phone: this.form.phone }, function(res) {
+    this.form.phone = this.form.phone;
+    ajax('/admin/login/send-phone-code', this.form, function(res) {
         " . vue_message() . "
         if (res.code == 0) {
             _this.countdown = 60;

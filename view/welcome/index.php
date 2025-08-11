@@ -1,4 +1,3 @@
 <?php 
 
-do_action("admin.welcome.index");
-
+do_action($user_tag.".index"); 

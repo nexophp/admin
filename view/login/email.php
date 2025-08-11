@@ -39,14 +39,14 @@ view_header(lang('邮箱验证码登录'));
                     <div class="d-flex">
                         <el-button 
                             type="primary" 
-                            @click="login"
+                            @click="login_click"
                             style="flex: 1;"
                             :loading="loading"
                         >
                            '.lang('登录').'</el-button>
                         <el-button 
                             type="default" 
-                            @click="sendCode"
+                            @click="code_click"
                             style="margin-left: 10px;"
                             :loading="sendingCode"
                             :disabled="countdown > 0"
@@ -77,7 +77,12 @@ $vue->data("form", [
     'email' => '',
     'code' => ''
 ]);
-
+$vue->method("login_click()","
+    this.login();
+");
+$vue->method("code_click()","
+    this.sendCode();
+");
 $vue->method("login()", "
     if (!this.form.email) {
         this.\$message.error('" . lang('请输入邮箱') . "');
@@ -105,7 +110,8 @@ $vue->method("sendCode()", "
         return;
     }
     this.sendingCode = true;
-    ajax('/admin/login/send-email-code', { email: this.form.email }, function(res) {
+    this.form.email = this.form.email;
+    ajax('/admin/login/send-email-code', this.form, function(res) {
         " . vue_message() . "
         if (res.code == 0) {
             _this.countdown = 60;

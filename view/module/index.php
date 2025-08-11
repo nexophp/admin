@@ -10,13 +10,13 @@ this.height = 'calc(100vh - ".get_config('admin_table_height')."px)';
 $vue->method("install(id)", "
     ajax('/admin/module/install',{id:id},function(res){
         ".vue_message()."
-        _this.load_list_search();
+        _this.load_list();
     });
 ");
 $vue->method("uninstall(id)", "
     ajax('/admin/module/uninstall',{id:id},function(res){
         ".vue_message()."
-        _this.load_list_search();
+        _this.load_list();
     });
 ");
 $vue->data("can_install",false);
@@ -50,7 +50,27 @@ echo element('table', [
     ['name' => 'open', ':data' => 'list', ':height' => 'height'],
     ['name' => 'column', 'prop' => 'title', 'label' => lang('模块'), 'width' => ''],
     ['name' => 'column', 'prop' => 'name', 'label' => lang('模块名称'), 'width' => ''],
-    ['name' => 'column', 'prop' => 'module_info.author', 'label' => lang('模块作者'), 'width' => ''],
+    ['name' => 'column', 'prop' => 'module_info.version', 'label' => lang('模块版本'), 'width' => ''], 
+    ['name' => 'column', 'prop' => 'depends', 'label' => lang('依赖'), 'width' => '',
+        'tpl' => [
+            ['name' => 'html', 'html' => '<div v-html="scope.row.depends"></div>'], 
+        ] 
+    ],
+
+
+    ['name' => 'column', 'prop' => 'module_info.author', 'label' => lang('模块作者'), 'width' => '',
+        'tpl' => [
+            ['name' => 'html', 'html' => '
+                <div v-if="scope.row.module_info.url">
+                    <a :href="scope.row.module_info.url" class="link hand" target="_blank">{{scope.row.module_info.author}}</a>
+                </div>
+                <div v-else>
+                    {{scope.row.module_info.author}}
+                </div>
+            '], 
+        ]
+
+    ],
     [
         'name' => 'column',
         'prop' => 'count',

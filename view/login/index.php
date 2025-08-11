@@ -42,7 +42,7 @@ view_header(lang('登录'));
                 'html'=>'<el-form-item>
                     <el-button 
                         type="primary" 
-                        @click="login"
+                        @click="login_click"
                         style="width: 100%;"
                         :loading="loading"
                     >
@@ -55,11 +55,10 @@ view_header(lang('登录'));
         ]);
         ?>
         
-        <div class="login-footer">
-            <?php 
-            include __DIR__.'/login-footer.php';
-            ?>
-        </div>
+        
+        <?php 
+        include __DIR__.'/login-footer.php';
+        ?> 
     </div>
 </div>
 
@@ -70,6 +69,9 @@ $vue->data("form", [
     'username' => '',
     'password' => ''
 ]);
+$vue->method("login_click()","
+    this.login();
+");
 $vue->method("login()","
     this.loading = true;
     ajax('/admin/login/account',this.form,function(res){

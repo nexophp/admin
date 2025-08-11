@@ -29,7 +29,7 @@ this.form = {
     id: '',
     username: '',
     password: '',
-    tag: 'user',
+    tag: 'admin',
     roles: []
 };
 this.formTitle = '".lang('添加用户')."';
@@ -170,11 +170,14 @@ echo element("pager", [
         </el-form-item>
         <el-form-item label="<?=lang('用户类型')?>">
             <el-select v-model="form.tag" placeholder="<?=lang('请选择用户类型')?>">
-                <el-option label="<?=lang('会员')?>" value="user"></el-option>
-                <el-option label="<?=lang('管理员')?>" value="admin"></el-option>
+                <?php $all = get_user_form_tags();
+                foreach($all as $k => $v){
+                    echo "<el-option label=\"$v\" value=\"$k\"></el-option>";
+                }
+                ?> 
             </el-select>
         </el-form-item>
-        <el-form-item label="<?=lang('角色')?>">
+        <el-form-item label="<?=lang('角色')?>" v-if="form.tag == 'admin' && form.id!=1">
             <el-select v-model="form.roles" multiple placeholder="<?=lang('请选择角色')?>">
                 <el-option 
                     v-for="role in roleList" 

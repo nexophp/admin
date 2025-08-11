@@ -8,7 +8,7 @@
  */
 
 namespace modules\admin\controller;
-
+use modules\admin\model\UserModel;
 
 class UserController extends \core\AdminController
 {
@@ -36,17 +36,7 @@ class UserController extends \core\AdminController
 
         // 获取用户角色信息
         if (!empty($list['data'])) {
-            $admin_tags = [
-                'admin'=>[
-                    'color'=>'green',
-                    'title'=>lang('管理员'),
-                ],
-                'user'=>[
-                    'color'=>'black',
-                    'title'=>lang('会员'),
-                ],
-                
-            ];
+            $admin_tags = get_user_table_tags();
             do_action("admin_tags",$admin_tags);
             foreach ($list['data'] as &$user) {
                 $tag = $admin_tags[$user['tag']]??'';
@@ -54,7 +44,7 @@ class UserController extends \core\AdminController
                 $user['tag_new_color'] = $tag['color']??'';
                 if($user['id'] == 1){
                     $user['tag_new'] = lang('超级管理员');
-                    $user['tag_new_color'] = '#8B0000';
+                    $user['tag_new_color'] = '#D53F8C';
                 }
                 $user['roles'] = $this->getUserRoles($user['id']);
                 $user['password'] = '';
@@ -91,7 +81,7 @@ class UserController extends \core\AdminController
 
         $data = [
             'username' => $username,
-            'password' => password_hash($password, PASSWORD_DEFAULT),
+            'password' => UserModel::model()->genPassword($password),
             'tag' => $tag,
             'created_at' => time(),
             'updated_at' => time()
@@ -143,7 +133,7 @@ class UserController extends \core\AdminController
 
         // 如果提供了新密码，则更新密码
         if (!empty($password)) {
-            $data['password'] = password_hash($password, PASSWORD_DEFAULT);
+            $data['password'] = UserModel::model()->genPassword($password);
         }
 
         $result = db_update('user', $data, ['id' => $id]);

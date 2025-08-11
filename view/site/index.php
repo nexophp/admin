@@ -5,6 +5,7 @@
     <title><?=lang('后台管理')?></title> 
     <?php 
     do_action("header");
+    $debug = $_GET['debug'] ?? 0;
     add_js("
         $('#logout').click(function(){ 
             layer.confirm('".lang('确定退出登录吗？')."', {
@@ -53,7 +54,7 @@
     $vue->data("drawer",false);
     $vue->method("bind_account()"," 
         this.drawer = true;
-    ");
+    "); 
     ?> 
 </head>
 <body>
@@ -102,13 +103,13 @@
                 if($children){
                     foreach($children as $kk=>$vv){
                         $url = create_new_url($vv['url']);  
-                        if(!has_access($url)){
+                        if(!has_access($url) && !$user_info['is_supper']){
                             unset($menu[$k]['children'][$kk]);
                         }
                     }
                 }else{
                     $url = create_new_url($v['url']);
-                    if(!has_access($url)){
+                    if(!has_access($url)  && !$user_info['is_supper']){
                         unset($menu[$k]);
                     }
                 }
@@ -130,8 +131,13 @@
                 </a>
                 <?php if($children){?>
                 <ul class="nav flex-column sub-menu">
-                    <?php foreach($children as $vv){?>
-                    <li class="nav-item"><a class="nav-link" href="#<?=$vv['url']?>"><?=lang($vv['title'])?></a></li>
+                    <?php foreach($children as $vv){ ?>
+                    <li class="nav-item" >
+                        <a class="nav-link" href="#<?=$vv['url']?>"><?=lang($vv['title'])?>
+                            <?php if($debug){?> <?=$vv['name']?>  <?=$vv['sort']?>  <?php }?>
+                        </a>
+                    </li>
+
                     <?php }?>
                 </ul>
                 <?php }?>

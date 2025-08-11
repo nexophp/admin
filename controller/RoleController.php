@@ -31,6 +31,7 @@ class RoleController extends \core\AdminController
                 'description[~]' => $name
             ];
         }
+        $where['sys_tag'] = 'admin';
         $list = db_pager('role', '*', $where);
         json($list);
     }
@@ -60,7 +61,9 @@ class RoleController extends \core\AdminController
             'description' => $description,
             'permissions' => is_array($permissions) ? json_encode($permissions) : $permissions,
             'created_at' => time(),
-            'updated_at' => time()
+            'updated_at' => time(),
+            'sys_tag' => 'admin'
+
         ];
         
         $id = db_insert('role', $data);

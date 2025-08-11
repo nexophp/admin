@@ -70,14 +70,14 @@ view_header(lang('找回密码'));
                     <div class="d-flex">
                         <el-button 
                             type="primary" 
-                            @click="resetPassword"
+                            @click="login_click"
                             style="flex: 1;"
                             :loading="loading"
                         >
                            '.lang('重置密码').'</el-button>
                         <el-button 
                             type="default" 
-                            @click="sendCode"
+                            @click="code_click"
                             style="margin-left: 10px;"
                             :loading="sendingCode"
                             :disabled="countdown > 0"
@@ -109,6 +109,13 @@ $vue->data("form", [
     'password' => '',
     'confirm' => ''
 ]);
+
+$vue->method("code_click()","
+    this.sendCode();
+");
+$vue->method("login_click()","
+    this.resetPassword();
+");
 
 $vue->method("resetPassword()", "
     if (!this.form.account) {
@@ -166,10 +173,9 @@ $vue->method("sendCode()", "
     }
     
     this.sendingCode = true;
-    ajax('/admin/login/send-reset-code', { 
-        account: this.form.account,
-        type: this.form.type
-    }, function(res) {
+    this.form.account = this.form.account;
+    this.form.type = this.form.type;
+    ajax('/admin/login/send-reset-code', this.form, function(res) {
         " . vue_message() . "
         if (res.code == 0) {
             _this.countdown = 60;
