@@ -48,9 +48,9 @@ echo element("filter", [
 <?php
 echo element('table', [
     ['name' => 'open', ':data' => 'list', ':height' => 'height'],
-    ['name' => 'column', 'prop' => 'title', 'label' => lang('模块'), 'width' => ''],
-    ['name' => 'column', 'prop' => 'name', 'label' => lang('模块名称'), 'width' => ''],
-    ['name' => 'column', 'prop' => 'module_info.version', 'label' => lang('模块版本'), 'width' => ''], 
+    ['name' => 'column', 'prop' => 'title', 'label' => lang('模块名称'), 'width' => ''],
+    ['name' => 'column', 'prop' => 'name', 'label' => lang('目录名'), 'width' => '200',":show-overflow-tooltip"=>"true"],
+    ['name' => 'column', 'prop' => 'module_info.version', 'label' => lang('模块版本'), 'width' => '130'], 
     ['name' => 'column', 'prop' => 'depends', 'label' => lang('依赖'), 'width' => '',
         'tpl' => [
             ['name' => 'html', 'html' => '<div v-html="scope.row.depends"></div>'], 
@@ -73,7 +73,7 @@ echo element('table', [
 <?php
 echo element("pager", [
     'data' => 'list',
-    'per_page' => get_config('per_page'),
+    'per_page' => 200,
     'per_page_name' => 'per_page',
     'url' => $url,
     'reload_data' => []

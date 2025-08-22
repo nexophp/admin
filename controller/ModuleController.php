@@ -43,22 +43,24 @@ class ModuleController extends \core\AdminController
         $id = $this->post_data['id'];
         $res = db_get_one('module', '*', ['id' => $id]);
         $depends = $res['module_info']['depends'];
-        if($depends){
-            foreach($depends as $item){
-                 $new_res = db_get_one('module', '*', ['name' => $item]);
-                 if(!$new_res){
+        if ($depends) {
+            foreach ($depends as $item) {
+                $new_res = db_get_one('module', '*', ['name' => $item]);
+                if (!$new_res) {
                     json_error(['msg' => lang('模块不存在')]);
-                 }
-                 $this->doInstall($new_res);
+                }
+                $this->doInstall($new_res);
             }
-        } 
-        $this->doInstall($res);  
+        }
+        $this->doInstall($res);
         json_success(['msg' => lang('安装成功')]);
     }
 
-    protected function doInstall($res){
+    protected function doInstall($res)
+    {
         $module_info = $res['module_info'];
         $path = $res['path'];
+        $name = $res['name'];
         $version = $module_info['version'];
         if (!$version || !$path) {
             json_error(['msg' => lang('模块不存在')]);
@@ -84,8 +86,14 @@ class ModuleController extends \core\AdminController
                 });
             }
         }
+        //version/V1_0_0::install()   
+        $version = str_replace(".", "_", $version);
+        $version = 'V' . $version;
+        $install_class = "\modules\\$name\\version\\$version";
+        if (class_exists($install_class) && method_exists($install_class, 'install')) {
+            $install_class::install();
+        }
         db_update('module', ['status' => 1, 'updated_at' => time()], ['id' => $res['id']]);
-
     }
     /**
      * 卸载
@@ -95,6 +103,14 @@ class ModuleController extends \core\AdminController
     {
         $id = $this->post_data['id'];
         db_update('module', ['status' => 0, 'updated_at' => time()], ['id' => $id]);
+        $name = db_get_one('module', 'name', ['id' => $id]);
+        $version = db_get_one('module', 'version', ['id' => $id]);
+        $version = str_replace(".", "_", $version);
+        $version = 'V' . $version;
+        $install_class = "\modules\\$name\\version\\$version";
+        if (class_exists($install_class) && method_exists($install_class, 'uninstall')) {
+            $install_class::uninstall();
+        }
         json_success(['msg' => lang('卸载成功')]);
     }
     /**
@@ -112,6 +128,7 @@ class ModuleController extends \core\AdminController
                     'name' => $k,
                     'title' => $v['title'],
                     'version' => $v['version'],
+                    'level' => $v['level']?:0, 
                     'path' => $v['path'],
                     'module_info' => $v['module_info'],
                     'created_at' => time(),
@@ -121,6 +138,7 @@ class ModuleController extends \core\AdminController
                     db_update('module', [
                         'title' => $v['title'],
                         'version' => $v['version'],
+                        'level' => $v['level']?:0, 
                         'path' => $v['path'],
                         'module_info' => $v['module_info'],
                         'updated_at' => time(),
@@ -144,20 +162,21 @@ class ModuleController extends \core\AdminController
                 'title[~]' => $title,
             ];
         }
+        $where['ORDER'] = ['level' => 'DESC'];
         $list = db_pager('module', '*', $where);
-        foreach ($list['data'] as $k => &$v) { 
-            $depends = $v['module_info']['depends']; 
+        foreach ($list['data'] as $k => &$v) {
+            $depends = $v['module_info']['depends'];
             $str = "";
             if ($depends) {
-                 foreach($depends as $item){ 
-                    if(has_installed_module($item)){ 
-                        $str .= "<span class='el-tag el-tag--success mr-3' style='margin-right:10px'>$item</span>";
-                    }else{
-                        $str .= "<span title='".lang('模块未安装')."' class='el-tag el-tag--danger mr-3' style='margin-right:10px'>$item</span>";
+                foreach ($depends as $item) {
+                    if (has_installed_module($item)) {
+                        $str .= "<span class='el-tag el-tag--success mr-3 mb-2' style='margin-right:10px'>$item</span>";
+                    } else {
+                        $str .= "<span title='" . lang('模块未安装') . "' class='el-tag el-tag--danger mr-3' style='margin-right:10px'>$item</span>";
                     }
-                 }
+                }
             }
-            $v['depends'] = $str; 
+            $v['depends'] = $str;
         } 
         json($list);
     }
@@ -167,7 +186,7 @@ class ModuleController extends \core\AdminController
      */
     protected function loadFromVendor()
     {
-        global $modules; 
+        global $modules;
         $output = [];
         $list = get_all_modules();
         foreach ($list as $file) {
@@ -180,6 +199,7 @@ class ModuleController extends \core\AdminController
             $output[$name] = [
                 'title' => $module_info['title'],
                 'version' => $module_info['version'],
+                'level' => $module_info['level']?:0, 
                 'name' => $name,
                 'path' => $path,
                 'module_info' => $module_info,
@@ -192,6 +212,7 @@ class ModuleController extends \core\AdminController
                     'name' => $name,
                     'title' => $title,
                     'version' => $version,
+                    'level' => $module_info['level']?:0, 
                     'path' => $path,
                     'module_info' => $module_info,
                     'created_at' => time(),
@@ -200,7 +221,7 @@ class ModuleController extends \core\AdminController
                 db_update('module', [
                     'title' => $title,
                     'version' => $version,
-                    'path' => $path,
+                    'level' => $module_info['level']?:0,  
                     'module_info' => $module_info,
                 ], ['id' => $id]);
             }

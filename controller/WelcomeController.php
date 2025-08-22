@@ -19,6 +19,6 @@ class WelcomeController extends \core\AdminController
 
     public function actionIndex()
     {
-        $this->view_data['user_tag'] = $this->user_info['tag'];
+        
     }
 }
