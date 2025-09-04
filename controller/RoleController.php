@@ -167,7 +167,7 @@ class RoleController extends \core\AdminController
      */
     public function actionAll()
     {
-        $roles = db_get('role', "*",[]);
+        $roles = db_get('role', "*",['sys_tag'=>'admin']);
         json_success(['data' => $roles]);
     }
 }
