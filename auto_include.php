@@ -155,7 +155,7 @@ function create_user($arr = [], $tag = 'user', $is_supper = 0, $err = false)
     if ($id) {
         if ($err) {
             json_error(['msg' => lang('用户名已存在')]);
-        } 
+        }
         if (in_array($res['tag'], ['admin', 'seller', 'store'])) {
             if ($err) {
                 json_error(['msg' => lang('用户名已存在')]);
@@ -208,4 +208,40 @@ function is_login_action()
     ])) {
         return true;
     }
+}
+
+/**
+ * 本地文件上传到数据库
+ */
+function local_file_to_db($url)
+{
+    global $user_id;
+    $file = WWW_PATH . $url;
+    $md5 = md5_file($file);
+    $mime = mime_content_type($file);
+    $size = filesize($file);
+    $file_ext = pathinfo($file, PATHINFO_EXTENSION);
+    $ori_name = pathinfo($file, PATHINFO_BASENAME);
+    $insert = [
+        'url' => $url,
+        'hash' => $md5,
+        'user_id' => $user_id,
+        'mime' => $mime,
+        'size' => $size,
+        'ext' => $file_ext,
+        'name' => $http_opt['name'] ?? $ori_name,
+        'created_at' => date('Y-m-d H:i:s')
+    ];
+    if (!$url || !$md5) {
+        return false;
+    }
+    $data = db_get_one('upload', '*', ['hash' => $md5]);
+    if (!$data) {
+        db_insert('upload', $insert);
+    }
+    $res = db_get_one('upload_user', '*', ['hash' => $md5, 'user_id' => $user_id]);
+    if (!$res) {
+        db_insert('upload_user', $insert);
+    }
+    return true;
 }
