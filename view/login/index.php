@@ -80,6 +80,10 @@ $vue->method("login()","
            setTimeout(function(){
                 window.location.href = '/admin/site';
            },1000);
+        }else if(res.jump){
+            setTimeout(function(){
+                window.location.href = res.jump;
+           },1000);
         }
         _this.loading = false;
     });

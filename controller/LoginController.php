@@ -87,6 +87,9 @@ class LoginController extends \core\AppController
         if (!$find) {
             json_error(['msg' => lang('帐号不存在')]);
         }
+        if(!$find['password']){
+            json_error(['msg' => lang('帐号未设置密码'),'jump'=>'/admin/login/phone']);
+        }
         if (password_verify($password, $find['password'])) {
             $time = time() + 86400 * 365 * 5;
             cookie('uid', $find['id'], $time);

@@ -105,6 +105,10 @@ function get_user_form_tags()
 {
     $list = [
         'admin' => lang('管理员'),
+        'user' => lang('会员'),
+        'seller' => lang('商家'),
+        'store' => lang('门店'),
+        'customer' => lang('客户'),
     ];
     do_action("user_form_tag", $list);
     return $list;
@@ -160,7 +164,7 @@ function create_user($arr = [], $tag = 'user', $is_supper = 0, $err = false)
             if ($err) {
                 json_error(['msg' => lang('用户名已存在')]);
             }
-            return;
+            return $id;
         }
         db_update("user", ['tag' => $tag, 'is_supper' => $is_supper], ['id' => $id]);
         return $id;
