@@ -249,3 +249,11 @@ function local_file_to_db($url)
     }
     return true;
 }
+
+/**
+ * 登录COOKIE时长
+ */
+function get_admin_login_cookie_time()
+{
+    return time() + 86400 * 365 * 5;
+}
